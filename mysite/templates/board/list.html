@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+        <!-- 게시글 목록 -->
+         <div class="mb-3">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th class="col-1">순번</th>
+                        <th class="col-6">제목</th>
+                        <th class="col-2">글쓴이</th>
+                        <th class="col-3">등록일시</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if boards %}
+                        {% for board in boards %}
+                            <tr>
+                                <td class="text-center">{{board.id}}</td>
+                                <td><a href="{% url 'board:read' board_id=board.id %}">{{board.title}}</a></td>
+                                <td class="text-center">{{board.created_by}}</td>
+                                <td class="text-center">{{board.created_at | date:"Y-m-d H:i"}}</td>
+                            </tr>
+                        {% endfor%}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">게시글이 없습니다.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+         </div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Board
 
+# 등록 폼
 class BoardForm(forms.ModelForm):
     class Meta:
         model = Board
@@ -35,3 +36,17 @@ class BoardForm(forms.ModelForm):
         if len(created_by) < 2 or len(created_by) > 20:
             raise forms.ValidationError("글쓴이 이름을 2자이상 20자이하로 입력하세요.")
         return created_by
+    
+# 삭제 폼
+# 삭제할때는 비밀번호만 넘겨야되니까 만들었다.
+class BoardDeleteForm(forms.ModelForm):
+    class Meta:
+        model = Board
+        fields = [ "password"]
+        
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+        if not password:
+            raise forms.ValidationError("비밀번호를 입력하세요.")
+        return password
+    

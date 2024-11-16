@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .forms import BoardForm
+from .forms import BoardForm,BoardDeleteForm
 from board.models import Board
 
 # 등록
@@ -19,7 +19,8 @@ def board_create(request):
             # 검사 성공
             board = form.save(commit=False)  # 들어온 정보를 준비만 해라
             board.save()  # DB에 저장
-            return HttpResponse("게시글 등록 성공")
+            messages.success(request,"게시글을 등록되었습니다.")
+            return redirect("board:read", board_id=board.id)
         else: 
             # 검사 실패
             # 에러메시지 띄우기
@@ -29,11 +30,67 @@ def board_create(request):
     return render(request, "board/create.html" )
 
 # 상세보기
-def detail(request, board_id):
+def board_read(request, board_id):
     board = Board.objects.get(id=board_id)
     context = {"board": board}
-    return render(request, "board/detail.html", context)
+    return render(request, "board/read.html", context)
+
 # 수정
+def board_update(request, board_id):
+    board = Board.objects.get(id=board_id)
+    context = {"board": board}
+
+    if request.method == "POST":
+        
+        form = BoardForm(request.POST)
+        if form.is_valid():
+            old_password = board.password
+            new_password = form.cleaned_data.get("password")
+            
+            if old_password == new_password:
+                # 게시글 수정
+                board = form.save(commit=False)
+                board.save()
+                
+                messages.success(request,"게시글을 수정하였습니다.")
+                return redirect("board:read", board_id=board.id)
+            else:
+                messages.error(request, "비밀번호가 일치하지 않습니다.")
+    #검사실패
+        else:
+            for field_name, error_message in form.errors.items():
+                messages.error(request, f"{form.fields[field_name].label}: {error_message[0]}")
+        
+    # GET 요청일때 빈 폼 반환
+    form = BoardForm(instance=board)
+    # board의 값을 instance에 넘긴다.
+    # 화면으로 넘김
+    context["form"] = form
+    
+    # 화면
+    return render(request, "board/update.html", context)
 
 # 삭제
+def board_delete (request, board_id):
+    board = Board.objects.get(id=board_id)
+    
+    if request.method == "POST":
+        form = BoardDeleteForm(request.POST)
+        
+        if form.is_valid():
+            old_password = board.password
+            new_password = form.cleaned_data.get("password")
+            
+            if old_password == new_password:
+                board.delete()
+                return HttpResponse("게시글이 삭제되었습니다.")
+            else:
+                messages.error(request,"비밀번호가 일치하지 않습니다")
+                return redirect("board:read", board_id=board.id)       
 
+
+# 목록
+def board_list(request):
+    boards = Board.objects.all()
+    context = {"boards":boards}
+    return render(request, "board/list.html", context)    
