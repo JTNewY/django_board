@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load my_filter %}
 
 {% block content %}
         <!-- 게시글 목록 -->
@@ -16,7 +17,10 @@
                     {% if boards %}
                         {% for board in boards %}
                             <tr>
-                                <td class="text-center">{{board.id}}</td>
+                                <!-- 번호 = 전체건수 - 시작 인덱스 - 현재인덱스 + 1 -->
+                                <td class="text-center">
+                                    {{ boards.paginator.count|minus:boards.start_index|minus:forloop.counter0|add:1 }}
+                                </td>
                                 <td><a href="{% url 'board:read' board_id=board.id %}">{{board.title}}</a></td>
                                 <td class="text-center">{{board.created_by}}</td>
                                 <td class="text-center">{{board.created_at | date:"Y-m-d H:i"}}</td>
@@ -30,4 +34,52 @@
                 </tbody>
             </table>
          </div>
+
+         <div>
+            <!-- 페이징 -->
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                
+                <!-- 이전 10 페이지 -->
+                {% if boards.number > 10 %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ boards.number|add:-10 }}"><b style="color:black"> << </b> </a>
+                </li>
+                {% endif %}
+          
+                <!-- 이전 페이지 -->
+                {% if boards.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ boards.previous_page_number }}"><b style="color:black"> < </b></a>
+                </li>
+                {% endif %}
+          
+                <!-- 페이지 리스트 -->
+                {% for page_number in boards.paginator.page_range %}
+                  {% if page_number >= boards.number|add:-5 and page_number <= boards.number|add:5 %}
+                  <li class="page-item {% if page_number == boards.number %}active{% endif %}">
+                    <a class="page-link" href="{% url 'board:list' %}?page={{ page_number }}">
+                      {{ page_number }}
+                    </a>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+          
+                <!-- 다음 페이지 -->
+                {% if boards.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ boards.next_page_number }}"><b style="color:black"> > </b></a>
+                </li>
+                {% endif %}
+          
+                <!-- 다음 10 페이지 -->
+                {% if boards.number < boards.paginator.num_pages|add:-9 %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ boards.number|add:10 }}"><b style="color:black">>> </b></a>
+                </li>
+                {% endif %}
+          
+              </ul>
+            </nav>
+          </div>
 {% endblock %}

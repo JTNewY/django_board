@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .forms import BoardForm,BoardDeleteForm
 from board.models import Board
+from django.core.paginator import Paginator  
 
 # 등록
 def board_create(request):
@@ -42,7 +43,7 @@ def board_update(request, board_id):
 
     if request.method == "POST":
         
-        form = BoardForm(request.POST)
+        form = BoardForm(request.POST, instance=board)
         if form.is_valid():
             old_password = board.password
             new_password = form.cleaned_data.get("password")
@@ -89,8 +90,23 @@ def board_delete (request, board_id):
                 return redirect("board:read", board_id=board.id)       
 
 
+
 # 목록
 def board_list(request):
-    boards = Board.objects.all()
-    context = {"boards":boards}
-    return render(request, "board/list.html", context)    
+    # for i in range(1, 2000):  # ID 1부터 300까지
+    #     try:
+    #         board = Board.objects.get(id=i)
+    #         board.delete()
+    #         print(f"게시글 ID {i} 삭제 완료")
+    #     except Board.DoesNotExist:
+    #         print(f"게시글 ID {i}는 존재하지 않습니다")
+    # 테스트 글 추가
+    # for i in range(1, 300):
+    #     Board.objects.create(title=f"제목 {i}", content=f"내용{i}",password="1234",created_by="홍길동")
+    
+    page = request.GET.get('page', '1')  # 요청에서 현재 페이지 번호를 가져옵니다.
+    boards = Board.objects.all().order_by('-created_at')  # 게시글을 최신순으로 정렬합니다.
+    paginator = Paginator(boards, 10)  # 페이지당 10개의 게시글로 나눕니다.
+    page_obj = paginator.get_page(page)  # 해당 페이지의 게시글 객체를 가져옵니다.
+    context = {"boards": page_obj}  # 페이지네이션된 객체를 컨텍스트에 추가합니다.
+    return render(request, "board/list.html", context)  # 템플릿에 전달합니다.

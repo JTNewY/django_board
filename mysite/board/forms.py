@@ -49,4 +49,3 @@ class BoardDeleteForm(forms.ModelForm):
         if not password:
             raise forms.ValidationError("비밀번호를 입력하세요.")
         return password
-    
