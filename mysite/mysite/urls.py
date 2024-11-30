@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('board/', include('board.urls')),
+    path('tinymce/', include('tinymce.urls')),
+    path('common/', include('common.urls')),
 ]

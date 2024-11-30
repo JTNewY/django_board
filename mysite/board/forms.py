@@ -1,11 +1,14 @@
 from django import forms
 from .models import Board
+from tinymce.widgets import TinyMCE
+
 
 # 등록 폼
 class BoardForm(forms.ModelForm):
     class Meta:
         model = Board
         fields = ["title", "content", "password", "created_by"]
+        widgets = {'content': TinyMCE(attrs={'cols': 80, 'rows': 30})}
         
     def clean_title(self):
         title = self.cleaned_data.get("title")

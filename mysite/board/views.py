@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from .forms import BoardForm,BoardDeleteForm
 from board.models import Board
 from django.core.paginator import Paginator  
+from django.db.models import Q
 
 # 등록
 def board_create(request):
@@ -39,13 +40,13 @@ def board_read(request, board_id):
 # 수정
 def board_update(request, board_id):
     board = Board.objects.get(id=board_id)
+    old_password = board.password
     context = {"board": board}
 
     if request.method == "POST":
         
         form = BoardForm(request.POST, instance=board)
         if form.is_valid():
-            old_password = board.password
             new_password = form.cleaned_data.get("password")
             
             if old_password == new_password:
@@ -74,12 +75,12 @@ def board_update(request, board_id):
 # 삭제
 def board_delete (request, board_id):
     board = Board.objects.get(id=board_id)
+    old_password = board.password
     
     if request.method == "POST":
         form = BoardDeleteForm(request.POST)
         
         if form.is_valid():
-            old_password = board.password
             new_password = form.cleaned_data.get("password")
             
             if old_password == new_password:
@@ -93,6 +94,7 @@ def board_delete (request, board_id):
 
 # 목록
 def board_list(request):
+    
     # for i in range(1, 2000):  # ID 1부터 300까지
     #     try:
     #         board = Board.objects.get(id=i)
@@ -106,7 +108,43 @@ def board_list(request):
     
     page = request.GET.get('page', '1')  # 요청에서 현재 페이지 번호를 가져옵니다.
     boards = Board.objects.all().order_by('-created_at')  # 게시글을 최신순으로 정렬합니다.
+    search_type = request.GET.get('search_type','')
+    keyword = request.GET.get('keyword', '').strip()
+    
+    if keyword:
+        if search_type == 'title':
+            boards = boards.filter(Q(title__icontains=keyword))
+        elif search_type == 'content':
+            boards = boards.filter(Q(content__icontains=keyword))
+        elif search_type == 'created_by':
+            boards = boards.filter(Q(created_by__icontains=keyword))
+        elif search_type == 'all':
+            boards = boards.filter(
+                Q(title__icontains=keyword) |
+                Q(content__icontains=keyword) |
+                Q(created_by__icontains=keyword)
+            )
+    #   if keyword : 
+    #     if search_type == 'title':
+    #         boards = boards.filter(Q(title__icontains=keyword))
+    #     elif search_type == 'content':
+    #         boards = boards.filter(Q(content__icontains=keyword))
+    #     elif search_type == 'created_by':
+    #         boards = boards.filter(Q(created_by__icontains=keyword))
+    #     elif search_type == 'all':
+    #         boards = boards.filter(
+    #         Q(title__icontains=keyword) | 
+    #         Q(content__icontains=keyword) |
+    #         Q(created_by__icontains=keyword)
+    #         )   
+        
+        
+        
     paginator = Paginator(boards, 10)  # 페이지당 10개의 게시글로 나눕니다.
     page_obj = paginator.get_page(page)  # 해당 페이지의 게시글 객체를 가져옵니다.
-    context = {"boards": page_obj}  # 페이지네이션된 객체를 컨텍스트에 추가합니다.
+    context = {
+               "boards": page_obj,
+               "keyword": keyword,
+               "search_type":search_type,
+               }  # 페이지네이션된 객체를 컨텍스트에 추가합니다.
     return render(request, "board/list.html", context)  # 템플릿에 전달합니다.

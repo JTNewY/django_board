@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load my_filter %}
+
+{% block content %}
+    <div style="display:flex; align-items: center; justify-content: center;">
+       <div class="card col-md-4" >
+        <div class="card-body">
+            <h1>회원가입</h1>
+                <form action="" id="createForm" method="POST">
+                    {% csrf_token %} 
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">이름</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="이름을 입력하세요" value="{{form.first_name.value|default_if_none:''}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" value="{{form.email.value|default_if_none:''}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">아이디</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="아이디를 입력하세요" value="{{form.username.value|default_if_none:''}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_chk" class="form-label">비밀번호확인</label>
+                        <input type="password" class="form-control" id="password_chk" name="password_chk" placeholder="비밀번호 확인을 입력하세요">
+                    </div>
+                    <div>
+                        <button id="submit"type="submit" class="btn btn-primary">게시글 등록</button>
+                        <a href="{% url 'common:login' %}" class="btn btn-danger">등록 취소</a>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script%}
+<script>
+    // jquery
+    // 제목 입력 폼에 포커스 설정
+    $('#first_name').focus();
+
+    /*
+    // 입력 폼 유효성 검사
+    $('#createForm').on('submit',function(event){
+        if($[=-('#first_name').val() == ''){
+            alert('이름을 입력하세요.');]\
+            $('#first_name').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#email').val() == ''){
+            alert('이메일을 입력하세요.');
+            $('#email').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#username').val() =='' ){
+            alert('아이디를 입력하세요.');
+            $('#username').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password').val() =='' ){
+            alert('비밀번호를 입력하세요.');
+            $('#password').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password_chk').val() =='' ){
+            alert('비밀번호확인을 입력하세요.');
+            $('#password_chk').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password').val() != $('#password_chk').val() ){
+            alert('비밀번호와 비밀번호 확인이 일치하지않습니다.');
+            $('#password').focus();
+            event.preventDefault();
+            return false
+        }
+    });
+    */
+    // 입력폼 유효성 검사
+    $('#createForm').validate({
+        rules: {
+            first_name: {
+                required: true,
+                minlength: 2,
+                maxlength: 10
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            username: {
+                required: true,
+                minlength: 6,
+                maxlength: 20
+            },
+            password: {
+                required: true,
+                minlength: 8,
+                maxlength: 20
+            },
+            password_chk: {
+                required: true,
+                equalTo: '#password' // 패스워드가 같아야함
+            }
+        },
+        messages: {
+            first_name: {
+                required: '이름을 입력하세요',
+                minlength: '이름은 2자 이상이어야 합니다',
+                maxlength: '이름은 10자 이하이어야 합니다'
+            },
+            username: {
+                required: '아이디를 입력하세요',
+                minlength: '아이디는 6자 이상이어야 합니다',
+                maxlength: '아이디는 20자 이하이어야 합니다'
+            },
+            email: {
+                required: '이메일을 입력하세요',
+                email: '올바른 이메일 형식이 아닙니다.'
+            },
+            password: {
+                required: '비밀번호를 입력하세요',
+                minlength: '비밀번호는 최소 8자 이상이어야 합니다',
+                maxlength: '비밀번호는 최대 20자 이하이어야 합니다'
+            },
+            password_chk: {
+                required: '비밀번호 확인을 입력하세요',
+                equalTo: '비밀번호와 비밀번호 확인이 일치하지 않습니다.'
+            }
+        },
+        errorClass: 'is-invalid',
+        validClass: 'is-valid',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.mb-3').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass(errorClass).removeClass(validClass);
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).addClass(validClass).removeClass(errorClass);
+        },
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+
+    /*
+  // 제목 입력 폼에 포커스 설정
+  document.getElementById('title').focus() //document 현재 웹페이지를 말하고, getELementById는 id를 가져온다.
+  
+  // 입력 폼 유효성 검사
+  document.getElementById('createForm').addEventListener('submit',function(event) {
+    if(document.getElementById('title').value == ''){
+        alert("제목을 입력하세요.");
+        document.getElementById('title').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('content').value == ''){
+        alert("내용을 입력하세요.");
+        document.getElementById('content').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('created_by').value == ''){
+        alert("글쓴이를 입력하세요.");
+        document.getElementById('created_by').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if (document.getElementById('password').value == ''){
+        alert("비밀번호를 입력하세요.");
+        document.getElementById('password').focus();
+        event.preventDefault(); // 폼 제출을 막음
+    }
+  });
+*/
+</script>
+{% endblock %}

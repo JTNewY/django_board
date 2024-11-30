@@ -10,22 +10,36 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- 사용자 정의 CSS -->
     <link rel="stylesheet" href="{% static '/style.css'%}">
+    
+    {{ form.media }} 
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="margin-top:50px;">
 
       <!-- 메시지 -->
     {% include "message.html "%}
     <!-- //메시지 -->
 
     <!-- 컨텐츠 -->
-    {% block content %}{% endblock %}
+  
+    
+      {% block content %}
+      {% endblock %}
+      
     <!-- //컨텐츠 -->
     </div>
+
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/additional-methods.min.js"></script>
+    
 
     <!-- 부트스트랩 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <!-- 사용자 정의 자바스크립트 -->
     <script src="{% static 'scripts.js' %}"></script>
+    {% block script %}{%endblock%}
 </body>
 </html>

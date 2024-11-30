@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load my_filter %}
 
 {% block content %}
        <div class="card">
@@ -11,10 +12,11 @@
                 </div>
                 <div class="mb-3">
                     <label for="content" class="form-label">내용</label>
+                    {{ form.content }} 
                     <textarea rows="10" type="text" class="form-control" id="content" name="content" placeholder="내용을 입력하세요" value="{{form.content.value|default_if_none:''}}"></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="created_by" class="form-label">제목</label>
+                    <label for="created_by" class="form-label">글쓴이</label>
                     <input type="text" class="form-control" id="created_by" name="created_by" placeholder="글쓴이를 입력하세요" value="{{form.created_by.value|default_if_none:''}}">
                 </div>
                 <div class="mb-3">
@@ -22,11 +24,72 @@
                     <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요">
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary">게시글 등록</button>
-                    <a href="list.html" class="btn btn-danger">등록 취소</a>
+                    <button id="submit"type="submit" class="btn btn-primary">게시글 등록</button>
+                    <a href="{% url 'board:list' %}?{% query_string %}" class="btn btn-danger">등록 취소</a>
                 </div>
             </form>
         </div>
        </div>
     </div>
+{% endblock %}
+
+{% block script%}
+<script>
+    // jquery
+    // 제목 입력 폼에 포커스 설정
+    $('#title').focus();
+
+    // 입력 폼 유효성 검사
+    $('#createForm').on('submit',function(event){
+        if($('#title').val() == ''){
+            alert('제목을 입력하세요.');
+            $('#title').focus();
+            event.preventDefault();
+        }
+        else if($('#content').val() == ''){
+            alert('내용을 입력하세요.');
+            $('#content').focus();
+            event.preventDefault();
+        }
+        else if($('#created_by').val() =='' ){
+            alert('글쓴이를 입력하세요.');
+            $('#created_by').focus();
+            event.preventDefault();
+        }
+        else if($('#password').val() =='' ){
+            alert('비밀번호를 입력하세요.');
+            $('#password').focus();
+            event.preventDefault();
+        }
+    });
+
+    /*
+  // 제목 입력 폼에 포커스 설정
+  document.getElementById('title').focus() //document 현재 웹페이지를 말하고, getELementById는 id를 가져온다.
+  
+  // 입력 폼 유효성 검사
+  document.getElementById('createForm').addEventListener('submit',function(event) {
+    if(document.getElementById('title').value == ''){
+        alert("제목을 입력하세요.");
+        document.getElementById('title').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('content').value == ''){
+        alert("내용을 입력하세요.");
+        document.getElementById('content').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('created_by').value == ''){
+        alert("글쓴이를 입력하세요.");
+        document.getElementById('created_by').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if (document.getElementById('password').value == ''){
+        alert("비밀번호를 입력하세요.");
+        document.getElementById('password').focus();
+        event.preventDefault(); // 폼 제출을 막음
+    }
+  });
+*/
+</script>
 {% endblock %}

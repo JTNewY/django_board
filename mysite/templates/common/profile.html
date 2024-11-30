@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load my_filter %}
+
+{% block content %}
+    <div style="display:flex; align-items: center; justify-content: center;">
+       <div class="card col-md-4" >
+        <div class="card-body">
+            {% csrf_token %} 
+            <table class="table table-bordered">
+            <tr>
+                <th>이름</th>
+                <td>{{user.first_name}}</td>
+            </tr>
+            <tr>
+                <th>아이디</th>
+                <td>{{user.username}}</td>
+            </tr>
+            <tr>
+                <th>가입일</th>
+                <td>{{user.date_joined|date:"Y-m-d H:i"}}</td>
+            </tr>
+            <tr>
+                <th>최근접속일</th>
+                <td>{{user.last_login|date:"Y-m-d H:i"}}</td>
+            </tr>
+        </table>
+            <div class="mt-3">
+                <a href="{%url 'common:update_profile'%}" class="btn btn-warning">회원정보 수정</a>
+                <a href="{%url 'common:update_password'%}" class="btn btn-warning">비밀번호 변경</a>
+                <a href="{%url 'common:logout'%}" class="btn btn-danger">로그아웃</a>
+            </div>
+
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script%}
+<script>
+    // jquery
+    // 제목 입력 폼에 포커스 설정
+    $('#username').focus();
+
+    /*
+    // 입력 폼 유효성 검사
+    $('#createForm').on('submit',function(event){
+        if($[=-('#first_name').val() == ''){
+            alert('이름을 입력하세요.');]\
+            $('#first_name').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#email').val() == ''){
+            alert('이메일을 입력하세요.');
+            $('#email').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#username').val() =='' ){
+            alert('아이디를 입력하세요.');
+            $('#username').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password').val() =='' ){
+            alert('비밀번호를 입력하세요.');
+            $('#password').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password_chk').val() =='' ){
+            alert('비밀번호확인을 입력하세요.');
+            $('#password_chk').focus();
+            event.preventDefault();
+            return false
+        }
+        else if($('#password').val() != $('#password_chk').val() ){
+            alert('비밀번호와 비밀번호 확인이 일치하지않습니다.');
+            $('#password').focus();
+            event.preventDefault();
+            return false
+        }
+    });
+    */
+    // 입력폼 유효성 검사
+    $('#createForm').validate({
+        rules: {
+            username: {
+                required: true,
+            },
+            password: {
+                required: true,
+            },
+        },
+        messages: {
+            username: {
+                required: '아이디를 입력하세요',
+            },
+            password: {
+                required: '비밀번호를 입력하세요',
+            },
+        },
+        errorClass: 'is-invalid',
+        validClass: 'is-valid',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.mb-3').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass(errorClass).removeClass(validClass);
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).addClass(validClass).removeClass(errorClass);
+        },
+        submitHandler: function(form) {
+            form.submit();
+        }
+    });
+
+    /*
+  // 제목 입력 폼에 포커스 설정
+  document.getElementById('title').focus() //document 현재 웹페이지를 말하고, getELementById는 id를 가져온다.
+  
+  // 입력 폼 유효성 검사
+  document.getElementById('createForm').addEventListener('submit',function(event) {
+    if(document.getElementById('title').value == ''){
+        alert("제목을 입력하세요.");
+        document.getElementById('title').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('content').value == ''){
+        alert("내용을 입력하세요.");
+        document.getElementById('content').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if(document.getElementById('created_by').value == ''){
+        alert("글쓴이를 입력하세요.");
+        document.getElementById('created_by').focus();
+        event.preventDefault(); // 폼제출을 막음
+    }
+    else if (document.getElementById('password').value == ''){
+        alert("비밀번호를 입력하세요.");
+        document.getElementById('password').focus();
+        event.preventDefault(); // 폼 제출을 막음
+    }
+  });
+*/
+</script>
+{% endblock %}

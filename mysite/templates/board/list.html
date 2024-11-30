@@ -2,8 +2,33 @@
 {% load my_filter %}
 
 {% block content %}
-        <!-- 게시글 목록 -->
-         <div class="mb-3">
+    <!-- 게시글 검색,등록 버튼-->
+    
+    <div class="d-flex justify-content-between">
+      <form action="{%url 'board:list' %}" method="GET" class="d-flex">
+        <div class="input-group"> 
+          <select name="search_type" class="form-select" style="width: auto;">
+            <option value="title" {%if search_type == 'title'%}selected{%endif%}>제목</option>
+            <option value="content" {%if search_type == 'content'%}selected{%endif%}>내용</option>
+            <option value="created_by" {%if search_type == 'created_by'%}selected{%endif%}>글쓴이</option>
+            <option value="all" {%if search_type == 'all'%}selected{%endif%}>전체</option>
+          </select>
+
+          <input type="text" name="keyword" id="keyword" class="form-control" style="width: auto;" placeholder="검색어를 입력하세요." value="{{ keyword }}">
+
+          <button type="submit" class="btn btn-primary">검색</button>
+          {% if keyword %}
+            <a href="{%url 'board:list' %}" class="btn btn-danger">취소</a>
+          {% endif %}
+
+        </div>
+
+      </form>
+      <a href="{%url 'board:create'%}?{% query_string %}" class="btn btn-primary">등록</a>
+    </div>
+
+    <!-- 게시글 목록 -->
+      <div class="table-responsive my-3">
             <table class="table table-striped table-hover table-bordered">
                 <thead>
                     <tr class="text-center">
@@ -50,7 +75,7 @@
                 <!-- 이전 페이지 -->
                 {% if boards.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ boards.previous_page_number }}"><b style="color:black"> < </b></a>
+                  <a class="page-link" href="?{% query_string page=boards.previous_page_number%} "><b style="color:black"> < </b></a>
                 </li>
                 {% endif %}
           
@@ -58,7 +83,7 @@
                 {% for page_number in boards.paginator.page_range %}
                   {% if page_number >= boards.number|add:-5 and page_number <= boards.number|add:5 %}
                   <li class="page-item {% if page_number == boards.number %}active{% endif %}">
-                    <a class="page-link" href="{% url 'board:list' %}?page={{ page_number }}">
+                    <a class="page-link" href="{% url 'board:list' %}?{% query_string page=page_number%}">
                       {{ page_number }}
                     </a>
                   </li>
@@ -68,7 +93,7 @@
                 <!-- 다음 페이지 -->
                 {% if boards.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ boards.next_page_number }}"><b style="color:black"> > </b></a>
+                  <a class="page-link" href="?{%query_string page=boards.next_page_number %}"><b style="color:black"> > </b></a>
                 </li>
                 {% endif %}
           
@@ -79,7 +104,17 @@
                 </li>
                 {% endif %}
           
-              </ul>
-            </nav>
-          </div>
+        </ul>
+      </nav>
+    </div>
 {% endblock %}
+
+{% block script%}
+<script>
+
+  // 키워드 입력 폼에 포커스 설정
+  document.getElementById('keyword').focus() //document 현재 웹페이지를 말하고, getELementById는 id를 가져온다.
+  
+
+</script>
+{% endblock%}
